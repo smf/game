@@ -43,8 +43,16 @@ describe('calculo de marcador', function(){
       } else { 
         return puntos;
       }
+    } else {
+      if(tiempo < 10 && tiempo > 2) {
+        return puntos - 1;
+      } else if(tiempo > 10 && tiempo < 19) {
+        return puntos - 2;
+      } else {
+        return puntos - 3;
+      }
+    
     }
-    return puntos;
   }
 
   it("suma mas puntos si acierta muy rapido", function(){
