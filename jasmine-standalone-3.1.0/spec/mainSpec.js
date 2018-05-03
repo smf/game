@@ -21,16 +21,16 @@ describe('calculo de marcador', function(){
   function recalcularMarcador(puntos, esCorrecta, tiempo){
       if (esCorrecta && tiempo <= 2){
           return puntos + 2;
-      } else if(!esCorrecta && tiempo > 10 && tiempo < 19) {
-          return puntos -2;
-      } else if(!esCorrecta && tiempo < 10 && tiempo > 2) {
-        return puntos -1;
-      } else if(esCorrecta && tiempo > 2 && tiempo < 10) {
-        return puntos +1;
-      } else if(esCorrecta && tiempo > 10) {
-        return puntos;
-      } else if( !esCorrecta && tiempo >= 20) {
-        return puntos - 3;
+      } else if (!esCorrecta && tiempo > 10 && tiempo < 19) {
+          return puntos - 2;
+      } else if (!esCorrecta && tiempo < 10 && tiempo > 2) {
+          return puntos - 1;
+      } else if (esCorrecta && tiempo > 2 && tiempo < 10) {
+          return puntos + 1;
+      } else if (esCorrecta && tiempo > 10) {
+          return puntos;
+      } else if (!esCorrecta && tiempo >= 20) {
+          return puntos - 3;
       }
   }
 
@@ -48,11 +48,9 @@ describe('calculo de marcador', function(){
     expect(recalcularMarcador(5, true, 6)).toBe(6);
     expect(recalcularMarcador(1, true, 15)).toBe(1);
   });
+  
   it("es obligatorio responder a una pregunta", function(){
     expect(recalcularMarcador(5, null, 20)).toBe(2);
   });
  
-
-
-
 });
