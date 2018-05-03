@@ -12,27 +12,12 @@
 *      Si acierto y tardo mas de 10 segundos - 0 puntos
 *      No se puede pasar sin responder
 *      Si en 20 segundos no has respondido , pasa a siguiente pregunta y pierdes 3 puntos
-*
+*          
 *
 * */
 
 
 describe('calculo de marcador', function(){
-  // function recalcularMarcador(puntos, esCorrecta, tiempo){
-  //     if (esCorrecta && tiempo <= 2){
-  //         return puntos + 2;
-  //     } else if (!esCorrecta && tiempo > 10 && tiempo < 19) {
-  //         return puntos - 2;
-  //     } else if (!esCorrecta && tiempo < 10 && tiempo > 2) {
-  //         return puntos - 1;
-  //     } else if (esCorrecta && tiempo > 2 && tiempo < 10) {
-  //         return puntos + 1;
-  //     } else if (esCorrecta && tiempo > 10) {
-  //         return puntos;
-  //     } else if (!esCorrecta && tiempo >= 20) {
-  //         return puntos - 3;
-  //     }
-  // }
 
   function recalcularMarcador(puntos, esCorrecta, tiempo) {
     if(esCorrecta) {
@@ -44,14 +29,13 @@ describe('calculo de marcador', function(){
         return puntos;
       }
     } else {
-      if(tiempo < 10 && tiempo > 2) {
+      if(tiempo < 10) {
         return puntos - 1;
-      } else if(tiempo > 10 && tiempo < 19) {
+      } else if(tiempo > 10 && tiempo < 20) {
         return puntos - 2;
       } else {
         return puntos - 3;
       }
-    
     }
   }
 
