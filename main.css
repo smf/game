@@ -1,0 +1,42 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.header-title {
+    font-size: 3rem;
+}
+
+.questions-block, .points {
+    width: 30%;
+    float: left;
+}
+
+.questions-block {
+    margin: 5rem 3rem 2rem 5rem;
+}
+
+.main-questions {
+    margin-bottom: 3rem;
+}
+
+.question {
+    font-size: 4rem;
+}
+
+.form-quiz input {
+  display: inline-block;
+  font-size: 2rem;
+}
+
+.hidden {
+    display: none;
+}
+
