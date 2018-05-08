@@ -16,19 +16,35 @@
             <h1 class="header-title">Saber y ganar</h1>
             <p>responde mejor y más rápido que los demás</p>
         </div>
-        <div class="questions-block">
-            <div class="main-questions">
-                <p class="question"></p>
-                <form class="form-quiz" action="">
-                </form>
+        <div class="main-content">
+            <div class="questions-block">
+                <div class="main-questions">
+                    <h2 class="question"></h2>
+                    <form class="form-quiz" action="">
+                    </form>
+                </div>
+                <progress class="progressbar hidden" max="20" min="0" value="0"></progress>
+                <div class="send-answer">
+                    <h3></h3>
+                    <button class="send-button" type="button">Enviar respuesta</button>
+                    <button class="next-question-button" disabled type="button">Siguiente pregunta</button>
+                </div>
             </div>
-            <progress class="progressbar hidden" max="20" min="0" value="0"></progress>
-        </div>
-        <div class="points">
-            
+            <div class="points">
+                <h2 class="points-title">Marcadores</h2>
+                <table class="points-table">                 
+                    <tr>
+                        <td>María</td>
+                        <td>5 puntos</td> 
+                    </tr>
+                    <tr>
+                        <td>Sandra</td>
+                        <td>2 puntos</td> 
+                    </tr>  
+                </table>
+            </div>
         </div>
     </div>  
-    
     <script src="main.js"></script>
     <script>start();</script>
 </body>

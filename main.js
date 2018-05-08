@@ -86,18 +86,18 @@ function getQuestions(callback){
 // Ejemplo de uso:
 
 
-  function pickQuestion(questions, questionId) {
-    var id = questionId || 1 + Math.round(Math.random() * (questions.length - 1));
+//   function pickQuestion(questions, questionId) {
+//     var id = questionId || 1 + Math.round(Math.random() * (questions.length - 1));
 
-    for(let question of questions) {
-        if(question.question.id === id) {
-            // console.log(showQuestion(question));
-            return question;
-            // showAnswers(question.answers, true);
-            // break;    
-        }
-    }
-  }
+//     for(let question of questions) {
+//         if(question.question.id === id) {
+//             console.log(showQuestion(question));
+//             return question;
+//             showAnswers(question.answers, true);
+//             break;    
+//         }
+//     }
+//   }
 
   function showQuestion(question) {
       return question.question.text;
@@ -134,13 +134,25 @@ function getQuestions(callback){
     while(counter > 0){
         let index = Math.floor(Math.random() * counter);
         counter--;
-        [shuffledArray[counter], shuffledArray[index]] = [shuffledArray[index], shuffledArray[counter]];
+        [
+            shuffledArray[counter],
+            shuffledArray[index]
+        ] = [
+            shuffledArray[index],
+            shuffledArray[counter]
+        ];
+
+        //  var temp = shuffleArray[counter];
+        //  shuffleArray[counter] =  shuffleArray[index];
+        //  shuffleArray[index] = temp;
     }
     return shuffledArray;
   }
 
+
+
   function isCorrectAnswer(question, userSelectedAnswer) {
-      return userSelectedAnswer === question.correctAnswer;
+      return userSelectedAnswer === question.correctAnswerId;
   }
 
   function isValidAnswer(question, userSelectedAnswer) {
@@ -154,58 +166,103 @@ function start() {
     })
 
     printQuestion(questions.pop());
-    // intervalID = setInterval(() => {
-    //     if(questions.length > 0) {
-    //         printQuestion(questions.pop())
-    //     }
-    //     else {
-    //         stop(intervalID);
-    //     }
 
-    // }, 5000)
+    var nextButton = document.querySelector(".next-question-button");
+    var sendButton = document.querySelector(".send-button");
+    const message = document.querySelector(".send-answer h3");
+    nextButton.addEventListener("click", function(){
+
+        if(questions.length > 0) {
+            printQuestion(questions.pop());
+            sendButton.disabled = !sendButton.disabled;
+            nextButton.disabled = !nextButton.disabled;
+        } else {
+            stop();
+        }
+        message.innerHTML = '';
+
+    });
+
 }
 
-function stop(intervalID) {
+function stop() {
     document.querySelectorAll('.main-questions form *').forEach(item=>item.remove())
     document.querySelector('.question').innerHTML = '¡Tiempo!'
     document.querySelector('.progressbar').classList.add('hidden');
-    clearInterval(intervalID);
+    // clearInterval(intervalID);
 }
 
 function printQuestion(question) {
     const questionText = document.querySelector('.question')
     const form = document.querySelector('.main-questions form')
-    const radios = document.querySelectorAll('input[type=radio]')
     const progress = document.querySelector('progress')
-    const labels = document.querySelectorAll('label')
-    radios.forEach(radio => radio.remove())
-    labels.forEach(label => label.remove())
-    questionText.innerHTML = showQuestion(question)
+    const formControls = document.querySelectorAll('form div.group')
+
+    formControls.forEach(control => control.remove())
+    questionText.innerHTML = showQuestion(question);
+
     document.querySelector('.progressbar').classList.remove('hidden');
 
     shuffle(question.answers).forEach(answer => {
         var input = document.createElement('input'),
-            label = document.createElement('label')
+            label = document.createElement('label'),
+            container = document.createElement('div')
+
         label.innerHTML = answer.text
         input.setAttribute('type','radio')
         input.setAttribute('name', 'answer')
         input.id = "answer" + answer.id
         label.setAttribute('for', "answer" + answer.id)
         input.value = answer.id
-        form.appendChild(input)
-        form.appendChild(label)
-    })
-    let index = 20;
-    progress.value = index;
+        container.classList.add('group')
+        container.appendChild(input)
+        container.appendChild(label)
+        form.appendChild(container)
+    });
+
+    let timer = 20;
+    progress.value = timer;
     let intervalID = setInterval(() => {
-        if(index > 0) {
-            index -= 0.01;
-            progress.value = index;
+        timer -= 0.01;
+        progressBar(timer, intervalID, progress);
+    }, 10);   
+
+
+
+    function progressBar(timer, intervalID, progress) {
+        if(timer > 0) {
+            progress.value = timer;
         }
         else {
             document.querySelectorAll('input[type=radio]')
-            .forEach(radio => radio.setAttribute('disabled', true))
+            .forEach(radio => radio.setAttribute('disabled', true));
+            nextButton.disabled = false;
+            sendButton.setAttribute("disabled", true);
+            message.innerHTML = "Se te pasó el tiempo, siguiente pregunta!"
             clearInterval(intervalID);
         }
-    }, 10);
+    }
+
+
+    var sendButton = document.querySelector(".send-button");
+    var nextButton = document.querySelector(".next-question-button");
+    const message = document.querySelector(".send-answer h3");
+    // const divAnswer = document.querySelector(".send-answer");
+    // divAnswer.insertBefore(message, divAnswer.firstChild);
+    
+    sendButton.addEventListener("click", function(){
+        var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
+
+        if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
+            message.innerHTML = "Correcto, has acertado!";
+            nextButton.disabled = false;
+            sendButton.disabled = !sendButton.disabled;
+            clearInterval(intervalID);
+        } else {
+            message.innerHTML = "Has fallado";
+        }
+
+    });
+
+
 }
