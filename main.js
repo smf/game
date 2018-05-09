@@ -150,7 +150,7 @@ function start() {
     var questions, intervalID;
     var nextButton = document.querySelector(".next-question-button");
     var sendButton = document.querySelector(".send-button");
-    const message = document.querySelector(".send-answer h3");
+    const  message = document.querySelector(".send-answer h3");
     
 
     getQuestions((data) => {
@@ -172,20 +172,25 @@ function start() {
             stop();
         }
 
-         message.innerHTML = 'Resultado ' + 'tienes ';
+        // message.innerHTML = 'Resultado ' + 'tienes ';
 
     });
+    intervalID = handleProgressBar(nextButton, sendButton, message);
 
-    sendButton.addEventListener("click", clickSendButton.bind(null, question));
+    sendButton.addEventListener("click", clickSendButton.bind(null, question, nextButton, sendButton, intervalID));
     // sendButton.addEventListener("click", () => {
     //     clickSendButton(question);
     // });
-    handleProgressBar();
 
 }
 
+
 function stop() {
     document.querySelectorAll('.main-questions form *').forEach(item=>item.remove());
+    /* 
+    const form = document.querySelector('.main-questions form')
+    while(form.lastChild) form.removeChild(form.lastChild)
+    */
     document.querySelector('.question').innerHTML = '¡Tiempo!';
     document.querySelector('.progressbar').classList.add('hidden');
 }
@@ -220,14 +225,16 @@ function printQuestion(question) {
 }
 
 
-function clickSendButton(question) {
-    var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
+function clickSendButton(question, nextButton, sendButton, intervalID) {
+    var selectedUserAnswer = document.querySelector("input[type=radio]:checked");
+    if (!selectedUserAnswer) return;
+    selectedUserAnswer = selectedUserAnswer.value;
     const message = document.querySelector(".send-answer h3");
 
-        if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
+        if (isCorrectAnswer(question, parseInt(selectedUserAnswer))) {
             message.innerHTML = "Correcto, has acertado!";
-        
-        } else {
+        }
+        else {
             message.innerHTML = "Has fallado";
         }
         nextButton.disabled = false;
@@ -236,7 +243,7 @@ function clickSendButton(question) {
 }
 
 
-function handleProgressBar() {
+function handleProgressBar(nextButton, sendButton, message) {
 
     const progress = document.querySelector('progress');
     let timer = 20;
@@ -258,5 +265,6 @@ function handleProgressBar() {
             clearInterval(intervalID);
         }
     }
+    return intervalID;
 
 }
