@@ -1,270 +1,202 @@
-function recalcularAcertandoPregunta(marcador, tiempo) {
-    if (tiempo <= 2) {
-        return marcador + 2;
+
+/*
+TO DO 
+
+1 Pintar Quiz
+    -Una pregunta
+    -3 posibles respuestas 
+
+    -Botón enviar
+    -Botón siguiente pregunta aparece disabled
+
+
+2 Generar pregunta   
+    -La pregunta sale de manera aleatoria
+
+3 Generar respuestas
+    -Las respuestas salen cada vez ordenadas de una forma distinta
+
+4  Cambio de estado del Botón siguiente pregunta
+    -Cuando el usuario selecciona un input y le da al boton enviar el Botón siguiente pregunta 
+      se puede pulsar.
+
+5 Validar resultado 
+    -Usuario selecciona un input. 
+    -hace click en el botón enviar. 
+    -Se generan 2 posibles respuestas que hay que pintar: 
+        *Pregunta correcta
+        *Pregunta fallida
+
+6  Inputs disabled
+    -Si antes de 20 segundos el usuario no ha seleccionado ningún input, todos los inputs pasan a disabled
+
+7 Contador
+    -Pintar una cuenta atrás desde 20 segundos por cada pregunta. 
+    - Opciones: 
+        *Si el usuario selecciona un input, el contador se para.
+        *Si el usuario no selecciona ningún input el contador llega a cero 
+         e imprime un mensaje "Se te ha acabado el tiempo"
+
+8 Boton siguiente pregunta 
+    -Cuando el usuario hace click en boton siguiente pregunta: 
+        *se borra la pregunta y respuesta anterior
+        *se genera una nueva pregunta y 3 respuestas
+        *cuando se ha terminado el cuestionario: 
+            ·se imprime un mensaje Has conseguido 3 puntos
+            ·Ya no se pinta siguiente pregunta
+            ·sale un input para enviar el nombre y un boton 
+
+
+*/
+
+
+
+
+
+function app() {
+    "use strict";
+
+    var formQuiz = document.querySelector(".form-quiz");
+    var currentQuestionIndex;
+
+    function getQuestions(callback){
+        var serverData = [
+            {
+                question: {id: 1, text: 'Pregunta1'},
+                answers: [{id: 1, text: 'A1'}, {id: 2, text: 'A2'}, {id: 3, text: 'A3'}],
+                correctAnswerId: 1
+                },
+            {
+                question: {id: 2, text: 'Pregunta2'},
+                answers: [{id: 4, text: 'B1'}, {id: 5, text: 'B2'}, {id: 6, text: 'B3'}],
+                correctAnswerId: 5
+                },
+            {
+                question: {id: 3, text: 'Pregunta3'},
+                answers: [{id: 7, text: 'C1'}, {id: 8, text: 'C2'}, {id: 9, text: 'C3'}],
+                correctAnswerId: 9
+                },          
+            ];
+        callback(serverData);
     }
-    if (tiempo <= 10) {
-        return marcador + 1;
+
+    var questions = [];
+    getQuestions(function(data){
+        questions = data;
+    });
+
+
+    function start() {
+        currentQuestionIndex = generateQuestion();
+
+        printQuestion(currentQuestionIndex);
+        printRandomAnswers(currentQuestionIndex);
     }
-    if (tiempo > 10){
-        return marcador;
+
+    function generateQuestion(){
+        var  quizQuestions = questions.slice(0);
+        var questionsRandom = Math.floor(Math.random() * quizQuestions.length);
+        return questionsRandom;
     }
-}
 
-
-function recalcularFallandoPregunta(marcador, tiempo) {
-    if (tiempo <= 10) {
-        return marcador - 1;
-    }
-    if (tiempo < 20) {
-        return marcador - 2;
-    }
-}
-
-function recalcularSinRespuesta(marcador) {
-    return marcador - 3;
-}
-
-
-
-
-//   const questions = [
-//       {
-//         id: 1,
-//         question: '¿Cual es la capital de Portugal?',
-//         answers: [
-//             {id: 1, value: 'Faro'},
-//             {id: 2, value: 'Oporto'},
-//             {id: 3, value: 'Lisboa'},
-//         ],
-//         correctAnswer: 3
-//     }, 
-    
-//     {
-//         id: 2,
-//         question: '¿Cual es la capital de Francia?',
-//         answers: [
-//             {id: 1, value: 'Faro'},
-//             {id: 2, value: 'Paris'},
-//             {id: 3, value: 'Roma'},
-//         ],
-//         correctAnswer: 2
-//     },
-
-//     {
-//         id: 3,
-//         question: '¿Cual es la capital de Italia?',
-//         answers: [
-//             {id: 1, value: 'Roma'},
-//             {id: 2, value: 'Paris'},
-//             {id: 3, value: 'Madrid'},
-//         ],
-//         correctAnswer: 1
-//     }
-// ]
-
-// La defincion de la funcion, copiar y pegar en vuestro codigo:
-
-
-function getQuestions(callback){
-    var serverData = [
-      {
-        question: {id: 1, text: 'Pregunta1'},
-        answers: [{id: 1, text: 'A1'}, {id: 2, text: 'A2'}, {id: 3, text: 'A3'}],
-        correctAnswerId: 1
-        },
-      {
-        question: {id: 2, text: 'Pregunta2'},
-        answers: [{id: 4, text: 'B1'}, {id: 5, text: 'B2'}, {id: 6, text: 'B3'}],
-        correctAnswerId: 5
-        },
-      {
-        question: {id: 3, text: 'Pregunta3'},
-        answers: [{id: 7, text: 'C1'}, {id: 8, text: 'C2'}, {id: 9, text: 'C3'}],
-        correctAnswerId: 9
-        },          
-    ];
-    callback(serverData);
-}
-
-
-function showQuestion(question) {
-    return question.question.text;
-}
-
-
-function showAnswers(answers, random) {
-
-    if(random) {
-        showRandomAnswers(answers);
-    } else {
+    function printRandomAnswers(questionIndex){
+        var answers = questions[questionIndex].answers;
+        answers.sort(function() { return 0.5 - Math.random()});
+        
         for(let answer of answers) {
-            console.log(answer.text);
-        }
+            let containerAnswer = document.createElement("div");
+            containerAnswer.setAttribute("class", "input-group");
+
+            let input = document.createElement("input");
+            input.value = answer.id;
+            input.setAttribute("type", "radio");
+            input.setAttribute("name", "answer-quiz");
+            input.setAttribute("class", "answer-quiz");
+            containerAnswer.appendChild(input);
+
+            let label = document.createElement("label");
+            label.innerText = answer.text;
+            containerAnswer.appendChild(label);
+
+            formQuiz.appendChild(containerAnswer);
+        } 
+        
     }
-}
+    
 
-function showRandomAnswers(answers) {
-
-    var randomIndex;
-    var answersLeft = answers.slice(0);
-
-    while(answersLeft.length > 0) {
-        randomIndex = Math.floor(Math.random() * answersLeft.length);
-        console.log(answersLeft.splice(randomIndex, 1)[0].text);
+    function printQuestion(questionIndex) {
+        var questionDom = document.createElement("h2");
+        
+        questionDom.innerText = questions[questionIndex].question.text;
+        formQuiz.appendChild(questionDom);        
     }
-}
 
-function shuffle(array) {
-    let shuffledArray = array.slice(0);
-    let counter = shuffledArray.length;
-
-
-    while(counter > 0){
-        let index = Math.floor(Math.random() * counter);
-        counter--;
-        [
-            shuffledArray[counter],
-            shuffledArray[index]
-        ] = [
-            shuffledArray[index],
-            shuffledArray[counter]
-        ];
-
-        //  var temp = shuffleArray[counter];
-        //  shuffleArray[counter] =  shuffleArray[index];
-        //  shuffleArray[index] = temp;
-        }
-    return shuffledArray;
-}
-
-
-function isCorrectAnswer(question, userSelectedAnswer) {
-    return userSelectedAnswer === question.correctAnswerId;
-}
-
-function isValidAnswer(question, userSelectedAnswer) {
-    return question.id === userSelectedAnswer.questionId;
-}
-
-function start() {
-    var questions, intervalID;
-    var nextButton = document.querySelector(".next-question-button");
     var sendButton = document.querySelector(".send-button");
-    const  message = document.querySelector(".send-answer h3");
-    
-
-    getQuestions((data) => {
-        questions = shuffle(data);
-    });
-    var question;
-    question = questions.pop();
-    printQuestion(question);
-
-    nextButton.addEventListener("click", function(){
-
-        if(questions.length > 0) {
-            question = questions.pop();
-            printQuestion(question);
-            sendButton.disabled = !sendButton.disabled;
-            nextButton.disabled = !nextButton.disabled;
-        } else {
-
-            stop();
-        }
-
-        // message.innerHTML = 'Resultado ' + 'tienes ';
-
-    });
-    intervalID = handleProgressBar(nextButton, sendButton, message);
-
-    sendButton.addEventListener("click", clickSendButton.bind(null, question, nextButton, sendButton, intervalID));
-    // sendButton.addEventListener("click", () => {
-    //     clickSendButton(question);
-    // });
-
-}
+    sendButton.addEventListener("click", validateAnswer);
 
 
-function stop() {
-    document.querySelectorAll('.main-questions form *').forEach(item=>item.remove());
-    /* 
-    const form = document.querySelector('.main-questions form')
-    while(form.lastChild) form.removeChild(form.lastChild)
-    */
-    document.querySelector('.question').innerHTML = '¡Tiempo!';
-    document.querySelector('.progressbar').classList.add('hidden');
-}
+    function validateAnswer() {
+        var result = getAnswerResult();
+        removeResult();
+        printResult(result);
+    }
 
-function printQuestion(question) {
-    const questionText = document.querySelector('.question');
-    const form         = document.querySelector('.form-quiz');
-    const formControls = document.querySelectorAll('form div.group');
+    function getAnswerResult() {
+        var radios = document.querySelectorAll(".answer-quiz");
+        var currentQuestion = questions[currentQuestionIndex];
 
-    formControls.forEach(control => control.remove());
-    questionText.innerHTML = showQuestion(question);
+        var selectedAnswerId;
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                selectedAnswerId = radios[i].value;       
+            }
+        }  
 
-    document.querySelector('.progressbar').classList.remove('hidden');
+       return isCorrectAnswer(currentQuestion, selectedAnswerId);
+    }
 
-    shuffle(question.answers).forEach(answer => {
-        var     input = document.createElement('input'),
-                label = document.createElement('label'),
-            container = document.createElement('div');
-
-        label.innerHTML = answer.text
-        input.setAttribute('type','radio')
-        input.setAttribute('name', 'answer')
-        input.id = "answer" + answer.id
-        label.setAttribute('for', "answer" + answer.id)
-        input.value = answer.id
-        container.classList.add('group')
-        container.appendChild(input)
-        container.appendChild(label)
-        form.appendChild(container)
-    });
-    
-}
+    function isCorrectAnswer(question, userSelectedAnswer) {
+        return question.correctAnswerId === parseInt(userSelectedAnswer);
+    }
 
 
-function clickSendButton(question, nextButton, sendButton, intervalID) {
-    var selectedUserAnswer = document.querySelector("input[type=radio]:checked");
-    if (!selectedUserAnswer) return;
-    selectedUserAnswer = selectedUserAnswer.value;
-    const message = document.querySelector(".send-answer h3");
+    function removeResult() {
+        document.querySelector(".form-quiz h2").remove();
+        var inputs = document.querySelectorAll(".input-group"); 
 
-        if (isCorrectAnswer(question, parseInt(selectedUserAnswer))) {
-            message.innerHTML = "Correcto, has acertado!";
-        }
-        else {
-            message.innerHTML = "Has fallado";
-        }
-        nextButton.disabled = false;
-        sendButton.disabled = true;
-        clearInterval(intervalID);
-}
-
-
-function handleProgressBar(nextButton, sendButton, message) {
-
-    const progress = document.querySelector('progress');
-    let timer = 20;
-    progress.value = timer;
-    let intervalID = setInterval(progressBar, 10);   
-
-    function progressBar() {
-       
-        if(timer > 0) {
-            timer -= 0.01;
-            progress.value = timer;
-        }
-        else {
-            document.querySelectorAll('input[type=radio]')
-            .forEach(radio => radio.setAttribute('disabled', true));
-            nextButton.disabled = false;
-            sendButton.setAttribute("disabled", true);
-            message.innerHTML = "Se te pasó el tiempo, siguiente pregunta!"
-            clearInterval(intervalID);
+        for(let input of inputs) {
+            input.remove();
         }
     }
-    return intervalID;
 
+    function printResult(correctAnswer) {
+
+        var containerQuestions = document.querySelector(".main-questions");
+
+        var message = document.createElement("p");
+        message.setAttribute("class", "message");
+ 
+        containerQuestions.appendChild(message);
+ 
+        if(correctAnswer) {
+            message.innerText = "Has acertado";
+        } else {
+            message.innerText = "Has fallado";
+        }
+
+
+    }
+
+
+   
+    start();
+    
 }
+
+app();
+
+
+
+
+
+
