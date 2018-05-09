@@ -26,6 +26,7 @@ function recalcularSinRespuesta(marcador) {
 
 
 
+
 //   const questions = [
 //       {
 //         id: 1,
@@ -62,6 +63,8 @@ function recalcularSinRespuesta(marcador) {
 // ]
 
 // La defincion de la funcion, copiar y pegar en vuestro codigo:
+
+
 function getQuestions(callback){
     var serverData = [
       {
@@ -79,32 +82,17 @@ function getQuestions(callback){
         answers: [{id: 7, text: 'C1'}, {id: 8, text: 'C2'}, {id: 9, text: 'C3'}],
         correctAnswerId: 9
         },          
-    ]
+    ];
     callback(serverData);
-};
-// La teneis que usar pasando un callback, o sea una funcion:
-// Ejemplo de uso:
+}
 
 
-//   function pickQuestion(questions, questionId) {
-//     var id = questionId || 1 + Math.round(Math.random() * (questions.length - 1));
-
-//     for(let question of questions) {
-//         if(question.question.id === id) {
-//             console.log(showQuestion(question));
-//             return question;
-//             showAnswers(question.answers, true);
-//             break;    
-//         }
-//     }
-//   }
-
-  function showQuestion(question) {
-      return question.question.text;
-  }
+function showQuestion(question) {
+    return question.question.text;
+}
 
 
-  function showAnswers(answers, random) {
+function showAnswers(answers, random) {
 
     if(random) {
         showRandomAnswers(answers);
@@ -113,20 +101,20 @@ function getQuestions(callback){
             console.log(answer.text);
         }
     }
-  }
+}
 
-  function showRandomAnswers(answers) {
+function showRandomAnswers(answers) {
 
-      var randomIndex;
-      var answersLeft = answers.slice(0);
+    var randomIndex;
+    var answersLeft = answers.slice(0);
 
-      while(answersLeft.length > 0) {
-          randomIndex = Math.floor(Math.random() * answersLeft.length);
-          console.log(answersLeft.splice(randomIndex, 1)[0].text);
-      }
-  }
+    while(answersLeft.length > 0) {
+        randomIndex = Math.floor(Math.random() * answersLeft.length);
+        console.log(answersLeft.splice(randomIndex, 1)[0].text);
+    }
+}
 
-  function shuffle(array) {
+function shuffle(array) {
     let shuffledArray = array.slice(0);
     let counter = shuffledArray.length;
 
@@ -145,60 +133,63 @@ function getQuestions(callback){
         //  var temp = shuffleArray[counter];
         //  shuffleArray[counter] =  shuffleArray[index];
         //  shuffleArray[index] = temp;
-    }
+        }
     return shuffledArray;
-  }
+}
 
 
+function isCorrectAnswer(question, userSelectedAnswer) {
+    return userSelectedAnswer === question.correctAnswerId;
+}
 
-  function isCorrectAnswer(question, userSelectedAnswer) {
-      return userSelectedAnswer === question.correctAnswerId;
-  }
-
-  function isValidAnswer(question, userSelectedAnswer) {
+function isValidAnswer(question, userSelectedAnswer) {
     return question.id === userSelectedAnswer.questionId;
-  }
+}
 
 function start() {
     var questions, intervalID;
+
     getQuestions((data) => {
-        questions = shuffle(data)
-    })
+        questions = shuffle(data);
+    });
 
     printQuestion(questions.pop());
 
     var nextButton = document.querySelector(".next-question-button");
     var sendButton = document.querySelector(".send-button");
     const message = document.querySelector(".send-answer h3");
+
     nextButton.addEventListener("click", function(){
 
-        if(questions.length > 0) {
-            printQuestion(questions.pop());
-            sendButton.disabled = !sendButton.disabled;
-            nextButton.disabled = !nextButton.disabled;
-        } else {
-            stop();
-        }
-        message.innerHTML = '';
+    if(questions.length > 0) {
+        printQuestion(questions.pop());
+        sendButton.disabled = !sendButton.disabled;
+        nextButton.disabled = !nextButton.disabled;
+    } else {
+
+        stop();
+    }
+
+    message.innerHTML = 'Resultado ' + 'tienes ';
 
     });
 
 }
 
 function stop() {
-    document.querySelectorAll('.main-questions form *').forEach(item=>item.remove())
-    document.querySelector('.question').innerHTML = '¡Tiempo!'
+    document.querySelectorAll('.main-questions form *').forEach(item=>item.remove());
+    document.querySelector('.question').innerHTML = '¡Tiempo!';
     document.querySelector('.progressbar').classList.add('hidden');
     // clearInterval(intervalID);
 }
 
 function printQuestion(question) {
-    const questionText = document.querySelector('.question')
-    const form = document.querySelector('.main-questions form')
-    const progress = document.querySelector('progress')
-    const formControls = document.querySelectorAll('form div.group')
+    const questionText = document.querySelector('.question');
+    const form = document.querySelector('.form-quiz');
+    const progress = document.querySelector('progress');
+    const formControls = document.querySelectorAll('form div.group');
 
-    formControls.forEach(control => control.remove())
+    formControls.forEach(control => control.remove());
     questionText.innerHTML = showQuestion(question);
 
     document.querySelector('.progressbar').classList.remove('hidden');
@@ -206,7 +197,7 @@ function printQuestion(question) {
     shuffle(question.answers).forEach(answer => {
         var input = document.createElement('input'),
             label = document.createElement('label'),
-            container = document.createElement('div')
+            container = document.createElement('div');
 
         label.innerHTML = answer.text
         input.setAttribute('type','radio')
@@ -228,7 +219,6 @@ function printQuestion(question) {
     }, 10);   
 
 
-
     function progressBar(timer, intervalID, progress) {
         if(timer > 0) {
             progress.value = timer;
@@ -247,22 +237,18 @@ function printQuestion(question) {
     var sendButton = document.querySelector(".send-button");
     var nextButton = document.querySelector(".next-question-button");
     const message = document.querySelector(".send-answer h3");
-    // const divAnswer = document.querySelector(".send-answer");
-    // divAnswer.insertBefore(message, divAnswer.firstChild);
     
     sendButton.addEventListener("click", function(){
         var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
 
         if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
             message.innerHTML = "Correcto, has acertado!";
-            nextButton.disabled = false;
-            sendButton.disabled = !sendButton.disabled;
-            clearInterval(intervalID);
+        
         } else {
             message.innerHTML = "Has fallado";
         }
-
+        nextButton.disabled = false;
+        sendButton.disabled = true;
+        clearInterval(intervalID);
     });
-
-
 }
