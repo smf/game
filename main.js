@@ -176,7 +176,10 @@ function start() {
 
     });
 
-    sendButton.addEventListener("click", clickSendButton);
+    sendButton.addEventListener("click", clickSendButton.bind(null, question));
+    // sendButton.addEventListener("click", () => {
+    //     clickSendButton(question);
+    // });
     handleProgressBar();
 
 }
@@ -189,7 +192,7 @@ function stop() {
 
 function printQuestion(question) {
     const questionText = document.querySelector('.question');
-    const form = document.querySelector('.form-quiz');
+    const form         = document.querySelector('.form-quiz');
     const formControls = document.querySelectorAll('form div.group');
 
     formControls.forEach(control => control.remove());
@@ -198,8 +201,8 @@ function printQuestion(question) {
     document.querySelector('.progressbar').classList.remove('hidden');
 
     shuffle(question.answers).forEach(answer => {
-        var input = document.createElement('input'),
-            label = document.createElement('label'),
+        var     input = document.createElement('input'),
+                label = document.createElement('label'),
             container = document.createElement('div');
 
         label.innerHTML = answer.text
@@ -213,15 +216,13 @@ function printQuestion(question) {
         container.appendChild(label)
         form.appendChild(container)
     });
-
-    
-    const message = document.querySelector(".send-answer h3");
     
 }
 
 
-function clickSendButton() {
+function clickSendButton(question) {
     var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
+    const message = document.querySelector(".send-answer h3");
 
         if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
             message.innerHTML = "Correcto, has acertado!";
