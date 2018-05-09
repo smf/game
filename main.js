@@ -148,31 +148,36 @@ function isValidAnswer(question, userSelectedAnswer) {
 
 function start() {
     var questions, intervalID;
+    var nextButton = document.querySelector(".next-question-button");
+    var sendButton = document.querySelector(".send-button");
+    const message = document.querySelector(".send-answer h3");
+    
 
     getQuestions((data) => {
         questions = shuffle(data);
     });
-
-    printQuestion(questions.pop());
-
-    var nextButton = document.querySelector(".next-question-button");
-    var sendButton = document.querySelector(".send-button");
-    const message = document.querySelector(".send-answer h3");
+    var question;
+    question = questions.pop();
+    printQuestion(question);
 
     nextButton.addEventListener("click", function(){
 
-    if(questions.length > 0) {
-        printQuestion(questions.pop());
-        sendButton.disabled = !sendButton.disabled;
-        nextButton.disabled = !nextButton.disabled;
-    } else {
+        if(questions.length > 0) {
+            question = questions.pop();
+            printQuestion(question);
+            sendButton.disabled = !sendButton.disabled;
+            nextButton.disabled = !nextButton.disabled;
+        } else {
 
-        stop();
-    }
+            stop();
+        }
 
-    message.innerHTML = 'Resultado ' + 'tienes ';
+         message.innerHTML = 'Resultado ' + 'tienes ';
 
     });
+
+    sendButton.addEventListener("click", clickSendButton);
+    handleProgressBar();
 
 }
 
@@ -180,13 +185,11 @@ function stop() {
     document.querySelectorAll('.main-questions form *').forEach(item=>item.remove());
     document.querySelector('.question').innerHTML = '¡Tiempo!';
     document.querySelector('.progressbar').classList.add('hidden');
-    // clearInterval(intervalID);
 }
 
 function printQuestion(question) {
     const questionText = document.querySelector('.question');
     const form = document.querySelector('.form-quiz');
-    const progress = document.querySelector('progress');
     const formControls = document.querySelectorAll('form div.group');
 
     formControls.forEach(control => control.remove());
@@ -211,16 +214,38 @@ function printQuestion(question) {
         form.appendChild(container)
     });
 
+    
+    const message = document.querySelector(".send-answer h3");
+    
+}
+
+
+function clickSendButton() {
+    var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
+
+        if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
+            message.innerHTML = "Correcto, has acertado!";
+        
+        } else {
+            message.innerHTML = "Has fallado";
+        }
+        nextButton.disabled = false;
+        sendButton.disabled = true;
+        clearInterval(intervalID);
+}
+
+
+function handleProgressBar() {
+
+    const progress = document.querySelector('progress');
     let timer = 20;
     progress.value = timer;
-    let intervalID = setInterval(() => {
-        timer -= 0.01;
-        progressBar(timer, intervalID, progress);
-    }, 10);   
+    let intervalID = setInterval(progressBar, 10);   
 
-
-    function progressBar(timer, intervalID, progress) {
+    function progressBar() {
+       
         if(timer > 0) {
+            timer -= 0.01;
             progress.value = timer;
         }
         else {
@@ -233,22 +258,4 @@ function printQuestion(question) {
         }
     }
 
-
-    var sendButton = document.querySelector(".send-button");
-    var nextButton = document.querySelector(".next-question-button");
-    const message = document.querySelector(".send-answer h3");
-    
-    sendButton.addEventListener("click", function(){
-        var selectedUserAnswer = document.querySelector("input[type=radio]:checked").value;
-
-        if(isCorrectAnswer(question, parseInt(selectedUserAnswer))){
-            message.innerHTML = "Correcto, has acertado!";
-        
-        } else {
-            message.innerHTML = "Has fallado";
-        }
-        nextButton.disabled = false;
-        sendButton.disabled = true;
-        clearInterval(intervalID);
-    });
 }
