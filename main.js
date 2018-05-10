@@ -39,7 +39,6 @@ TO DO
 
 8 Boton siguiente pregunta 
     -Cuando el usuario hace click en boton siguiente pregunta: 
-        *se borra la pregunta y respuesta anterior
         *se genera una nueva pregunta y 3 respuestas
         *cuando se ha terminado el cuestionario: 
             ·se imprime un mensaje Has conseguido 3 puntos
@@ -58,6 +57,7 @@ function app() {
 
     var formQuiz = document.querySelector(".form-quiz");
     var currentQuestionIndex;
+    
 
     function getQuestions(callback){
         var serverData = [
@@ -91,6 +91,7 @@ function app() {
 
         printQuestion(currentQuestionIndex);
         printRandomAnswers(currentQuestionIndex);
+
     }
 
     function generateQuestion(){
@@ -137,7 +138,7 @@ function app() {
 
     function validateAnswer() {
         var result = getAnswerResult();
-        removeResult();
+        removeQuiz();
         printResult(result);
     }
 
@@ -160,7 +161,7 @@ function app() {
     }
 
 
-    function removeResult() {
+    function removeQuiz() {
         document.querySelector(".form-quiz h2").remove();
         var inputs = document.querySelectorAll(".input-group"); 
 
@@ -183,11 +184,27 @@ function app() {
         } else {
             message.innerText = "Has fallado";
         }
-
+        
+        nextQuestion();
 
     }
 
+    function removePrintResult() {
+        var message = document.querySelector(".message");
+        message.remove();
+    }
 
+
+    function nextQuestion() {
+        var nextButton = document.querySelector(".next-question-button");
+        nextButton.disabled = false;
+        nextButton.addEventListener("click", function() {
+           
+            removePrintResult();
+            start();      
+           
+        });
+    }
    
     start();
     
@@ -197,6 +214,11 @@ app();
 
 
 
-
+// -Cuando el usuario hace click en boton siguiente pregunta: 
+//         *se genera una nueva pregunta y 3 respuestas
+//         *cuando se ha terminado el cuestionario: 
+//             ·se imprime un mensaje Has conseguido 3 puntos
+//             ·Ya no se pinta siguiente pregunta
+//             ·sale un input para enviar el nombre y un boton 
 
 
