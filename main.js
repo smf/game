@@ -58,7 +58,7 @@ function app() {
     var formQuiz = document.querySelector(".form-quiz");
     var currentQuestionIndex;
     var registerUserNameForm = document.querySelector(".register-username-form");
-    
+    var radios = document.querySelectorAll(".answer-quiz");
     
     
 
@@ -143,11 +143,22 @@ function app() {
         var result = getAnswerResult();
         printResult(result);
         removeQuiz();
-
+        countDownHide();
     }
 
+    function countDownHide() {
+        var counter = document.querySelector(".counter");
+        counter.style.visibility = "hidden";
+    }
+
+    function countDownVisible() {
+        var counter = document.querySelector(".counter");
+        counter.style.visibility = "visible";
+    }
+
+
     function getAnswerResult() {
-        var radios = document.querySelectorAll(".answer-quiz");
+        // var radios = document.querySelectorAll(".answer-quiz");
         var currentQuestion = questions[currentQuestionIndex];
 
         var selectedAnswerId;
@@ -210,9 +221,10 @@ function app() {
     var nextButton = document.querySelector(".next-question-button");
     nextButton.disabled = false;
     nextButton.addEventListener("click", function() {
-      
+        
         if(questions.length > 0) {
             start();
+            countDownVisible()
             removePrintResult();
         } else {
             removePrintResult();
@@ -224,11 +236,9 @@ function app() {
     var countDown;
     var timer;
 
-
     function countDownStart() {
         defineCountDown();
-        activateCountDown();
-        
+        activateCountDown();   
     }
 
     function defineCountDown(){
@@ -242,15 +252,19 @@ function app() {
         }, 1000);
     }
 
-
     function updateCountDown() {
         countDown--;
         var counterDom = document.querySelector(".counter");
         counterDom.innerHTML = "Tiempo: " + countDown;
 
-        if(countDown === 0) { 
+        if(countDown === 0 ) { 
             stopCountDown();
         }
+
+        if(countDown > 0) {
+            answerCheck();
+        }
+
     }
 
     function stopCountDown(){
@@ -258,47 +272,68 @@ function app() {
     }
 
 
-    function recalcularAcertandoPregunta(marcador, tiempo) {
-        if (tiempo <= 2) {
-            return marcador + 2;
-        }
-        if (tiempo <= 10) {
-            return marcador + 1;
-        }
-        if (tiempo > 10){
-            return marcador;
-        }
-    }
-    function recalcularFallandoPregunta(marcador, tiempo) {
-        if (tiempo <= 10) {
-            return marcador - 1;
-        }
-        if (tiempo < 20) {
-            return marcador - 2;
-        }
-    }
-    function recalcularSinRespuesta(marcador) {
-        return marcador - 3;
+    function answerCheck() {
+
+        var foundInputChecked = radios.find(function(element) {
+            return element.checked;
+          });
+
+        // console.log("paso por aqui")
+        // for (var i = 0; i < radios.length; i++) {
+        //     if (radios[i].checked) {
+
+        //         console.log("me meto en el if")
+        //         inputChecked = radios[i].checked;
+                    // stopCountDown();
+        //     }
+        // }
+        
     }
 
 
-    var registerUserButton = document.querySelector(".register-user-button");
-    registerUserButton.addEventListener("click", scoreBoardUser);
+    // function recalcularAcertandoPregunta(marcador, tiempo) {
+    //     if (tiempo <= 2) {
+    //         return marcador + 2;
+    //     }
+    //     if (tiempo <= 10) {
+    //         return marcador + 1;
+    //     }
+    //     if (tiempo > 10){
+    //         return marcador;
+    //     }
+    // }
 
-    function scoreBoardUser() {
-        console.log("hola");
+    // function recalcularFallandoPregunta(marcador, tiempo) {
+    //     if (tiempo <= 10) {
+    //         return marcador - 1;
+    //     }
+    //     if (tiempo < 20) {
+    //         return marcador - 2;
+    //     }
+    // }
+
+    // function recalcularSinRespuesta(marcador) {
+    //     return marcador - 3;
+    // }
+
+
+    // var registerUserButton = document.querySelector(".register-user-button");
+    // registerUserButton.addEventListener("click", scoreBoardUser);
+
+    // function scoreBoardUser() {
+    //     console.log("hola");
        
-        var scoreBoardTable = document.querySelector(".points-table");
-        var tr = document.createElement("tr");
-        var td = document.createElement("td");
-        var userInput = document.querySelector(".register-user-input");
-        td.innerText = userInput.value;
+    //     var scoreBoardTable = document.querySelector(".points-table");
+    //     var tr = document.createElement("tr");
+    //     var td = document.createElement("td");
+    //     var userInput = document.querySelector(".register-user-input");
+    //     td.innerText = userInput.value;
 
-        scoreBoardTable.appendChild(tr);
-        tr.appendChild(td);
+    //     scoreBoardTable.appendChild(tr);
+    //     tr.appendChild(td);
     
 
-    }
+    // }
     
 
 
