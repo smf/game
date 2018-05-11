@@ -119,3 +119,27 @@ button:disabled {
     font-size: 2rem;
     color:#292222;
 }
+
+.register-username-form label {
+    font-size: 1.6rem;
+    padding-right: 10px;
+}
+
+.register-user-button {
+    display: block;
+    margin-top: 20px;
+}
+
+.register-username-form {
+    display: none;
+}
+
+
+.register-username-form.visible {
+    display: block;
+}
+
+.counter {
+    font-size: 20px;
+    margin: 1rem 0;
+}

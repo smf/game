@@ -57,6 +57,9 @@ function app() {
 
     var formQuiz = document.querySelector(".form-quiz");
     var currentQuestionIndex;
+    var registerUserNameForm = document.querySelector(".register-username-form");
+    
+    
     
 
     function getQuestions(callback){
@@ -91,7 +94,7 @@ function app() {
 
         printQuestion(currentQuestionIndex);
         printRandomAnswers(currentQuestionIndex);
-
+        countDownStart();
     }
 
     function generateQuestion(){
@@ -138,8 +141,9 @@ function app() {
 
     function validateAnswer() {
         var result = getAnswerResult();
-        removeQuiz();
         printResult(result);
+        removeQuiz();
+
     }
 
     function getAnswerResult() {
@@ -162,18 +166,20 @@ function app() {
 
 
     function removeQuiz() {
+        // document.querySelector(".form-quiz").remove();
         document.querySelector(".form-quiz h2").remove();
         var inputs = document.querySelectorAll(".input-group"); 
 
         for(let input of inputs) {
             input.remove();
         }
+       questions.splice(currentQuestionIndex, 1);
+       
     }
 
     function printResult(correctAnswer) {
-
         var containerQuestions = document.querySelector(".main-questions");
-
+        
         var message = document.createElement("p");
         message.setAttribute("class", "message");
  
@@ -181,12 +187,12 @@ function app() {
  
         if(correctAnswer) {
             message.innerText = "Has acertado";
+            sendButton.disabled = false;
         } else {
             message.innerText = "Has fallado";
+            sendButton.disabled = false;
         }
         
-        nextQuestion();
-
     }
 
     function removePrintResult() {
@@ -194,23 +200,117 @@ function app() {
         message.remove();
     }
 
+    function registerUser() {
+        registerUserNameForm.classList.add("visible"); 
 
-    function nextQuestion() {
-        var nextButton = document.querySelector(".next-question-button");
-        nextButton.disabled = false;
-        nextButton.addEventListener("click", function() {
-           
-            removePrintResult();
-            start();      
-           
-        });
+        sendButton.style.visibility = 'hidden';
+        nextButton.style.visibility = 'hidden';        
     }
+  
+    var nextButton = document.querySelector(".next-question-button");
+    nextButton.disabled = false;
+    nextButton.addEventListener("click", function() {
+      
+        if(questions.length > 0) {
+            start();
+            removePrintResult();
+        } else {
+            removePrintResult();
+            registerUser();
+        }
+
+    });
+
+    var countDown;
+    var timer;
+
+
+    function countDownStart() {
+        defineCountDown();
+        activateCountDown();
+        
+    }
+
+    function defineCountDown(){
+        countDown = 21;
+    }
+
+    function activateCountDown() {
+        timer = setInterval(function(){ 
+         updateCountDown();
+        
+        }, 1000);
+    }
+
+
+    function updateCountDown() {
+        countDown--;
+        var counterDom = document.querySelector(".counter");
+        counterDom.innerHTML = "Tiempo: " + countDown;
+
+        if(countDown === 0) { 
+            stopCountDown();
+        }
+    }
+
+    function stopCountDown(){
+        clearInterval(timer);
+    }
+
+
+    function recalcularAcertandoPregunta(marcador, tiempo) {
+        if (tiempo <= 2) {
+            return marcador + 2;
+        }
+        if (tiempo <= 10) {
+            return marcador + 1;
+        }
+        if (tiempo > 10){
+            return marcador;
+        }
+    }
+    function recalcularFallandoPregunta(marcador, tiempo) {
+        if (tiempo <= 10) {
+            return marcador - 1;
+        }
+        if (tiempo < 20) {
+            return marcador - 2;
+        }
+    }
+    function recalcularSinRespuesta(marcador) {
+        return marcador - 3;
+    }
+
+
+    var registerUserButton = document.querySelector(".register-user-button");
+    registerUserButton.addEventListener("click", scoreBoardUser);
+
+    function scoreBoardUser() {
+        console.log("hola");
+       
+        var scoreBoardTable = document.querySelector(".points-table");
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        var userInput = document.querySelector(".register-user-input");
+        td.innerText = userInput.value;
+
+        scoreBoardTable.appendChild(tr);
+        tr.appendChild(td);
+    
+
+    }
+    
+
+
+    return {
+        start : start
+    }
+    
    
     start();
     
 }
 
-app();
 
 
 

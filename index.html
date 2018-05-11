@@ -21,10 +21,15 @@
                 <div class="main-questions">
                     <form class="form-quiz" action="">
                     </form>
+                    <form class="register-username-form">
+                        <label>Regístrate</label>
+                        <input class="register-user-input" type="text" name="register-user-input">
+                        <button class="register-user-button" type="submit">Envia tu nombre</button>
+                    </form>
+                    <div class="counter"></div>
                 </div>
-                <progress class="progressbar hidden" max="20" min="0" value="0"></progress>
+                <!-- <progress class="progressbar hidden" max="20" min="0" value="0"></progress> -->
                 <div class="send-answer">
-                    <p></p>
                     <button class="send-button" type="button">Enviar respuesta</button>
                     <button class="next-question-button" disabled type="button">Siguiente pregunta</button>
                 </div>
@@ -53,6 +58,7 @@
         </div>
     </div>  
     <script src="main.js"></script>
+    <script>app().start()</script>
    
 </body>
 
