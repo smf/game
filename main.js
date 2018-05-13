@@ -60,10 +60,13 @@ function app() {
     var registerUserNameForm = document.querySelector(".register-username-form");
     var nextButton = document.querySelector(".next-question-button");
     var sendButton = document.querySelector(".send-button");
+    var results = document.querySelector('.results');
     sendButton.addEventListener("click", validateAnswer);
     var countDown;
     var timer;
+    var totalSuccessQuestions = 0;
     var totalScore = 0;
+    var totalTimeAnswerSpeed = 0;
     
 
     function getQuestions(callback){
@@ -101,6 +104,7 @@ function app() {
         countDownStart();
         sendButtonStatus(true);
         nextButtonStatus(true);
+        resultStatus(true);
     }
 
     function generateQuestion(){
@@ -151,9 +155,9 @@ function app() {
     function validateAnswer() {
         var time = 20 - getCurrentTime();
         var result = getAnswerResult();
-        console.log(result, time);
 
         if (result) {
+            totalSuccessQuestions++;
             totalScore = scoreSuccessQuestion(totalScore, time);
         } else {
             totalScore = scoreFailQuestion(totalScore, time);
@@ -163,8 +167,7 @@ function app() {
             }
         }
 
-        console.log(totalScore);
-
+        totalTimeAnswerSpeed += time;
         printResult(result);
         sendButtonStatus(true);
         nextButtonStatus(false);
@@ -227,6 +230,13 @@ function app() {
         }
     }
 
+    function resultStatus(hidden) {
+        if (hidden) {
+            results.style.display = "none";
+        } else {
+            results.style.display = "block";
+        }
+    }
 
     function nextButtonStatus(disabled) {
         if (disabled) {
@@ -256,6 +266,7 @@ function app() {
     function registerUser() {
         registerUserNameForm.classList.add("visible"); 
 
+        document.querySelector(".total-score").innerText = totalScore;
         hideAnswerActionButtons();
     }
   
@@ -269,8 +280,21 @@ function app() {
         } else {
             removePrintResult();
             registerUser();
+            showResults();
         }
     });
+
+    function showResults() {
+        resultStatus(false);
+
+        var avgSpeed = document.querySelector(".avg-speed");
+        var totalSuccess = document.querySelector(".total-success");
+        var totalFails = document.querySelector(".total-fail");
+
+        totalSuccess.innerText = totalSuccessQuestions;
+        totalFails.innerText = 3 - totalSuccessQuestions;
+        avgSpeed.innerText = totalTimeAnswerSpeed / 3;
+    }
 
     function countDownStart() {
         defineCountDown();
@@ -298,8 +322,8 @@ function app() {
 
         if(countDown === 0 ) { 
             printCountDown();
-
             stopCountDown();
+            totalScore = scoreNotAnsweredQuestion(totalScore);
         }
     }
 
@@ -334,26 +358,23 @@ function app() {
         return score - 3;
     }
 
+    registerUserNameForm.addEventListener('submit', scoreBoardUser);
 
-    // var registerUserButton = document.querySelector(".register-user-button");
-    // registerUserButton.addEventListener("click", scoreBoardUser);
-
-    // function scoreBoardUser() {
-    //     console.log("hola");
-       
-    //     var scoreBoardTable = document.querySelector(".points-table");
-    //     var tr = document.createElement("tr");
-    //     var td = document.createElement("td");
-    //     var userInput = document.querySelector(".register-user-input");
-    //     td.innerText = userInput.value;
-
-    //     scoreBoardTable.appendChild(tr);
-    //     tr.appendChild(td);
+    function scoreBoardUser(e) {
+        e.preventDefault();
     
+        var scoreBoardTable = document.querySelector(".points-table tbody");
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        var userInput = document.querySelector(".register-user-input");
+        td.innerText = userInput.value;
+        tr.appendChild(td);
 
-    // }
-    
-
+        var tdScore = document.createElement("td");
+        tdScore.innerText = totalScore;
+        tr.appendChild(tdScore);
+        scoreBoardTable.appendChild(tr);
+    }
 
     return {
         start : start
