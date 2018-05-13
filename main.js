@@ -58,8 +58,12 @@ function app() {
     var formQuiz = document.querySelector(".form-quiz");
     var currentQuestionIndex;
     var registerUserNameForm = document.querySelector(".register-username-form");
-    var radios = document.querySelectorAll(".answer-quiz");
-    
+    var nextButton = document.querySelector(".next-question-button");
+    var sendButton = document.querySelector(".send-button");
+    sendButton.addEventListener("click", validateAnswer);
+    var countDown;
+    var timer;
+    var totalScore = 0;
     
 
     function getQuestions(callback){
@@ -95,6 +99,8 @@ function app() {
         printQuestion(currentQuestionIndex);
         printRandomAnswers(currentQuestionIndex);
         countDownStart();
+        sendButtonStatus(true);
+        nextButtonStatus(true);
     }
 
     function generateQuestion(){
@@ -113,52 +119,71 @@ function app() {
 
             let input = document.createElement("input");
             input.value = answer.id;
+            input.setAttribute("id", "answer-" + answer.id);
             input.setAttribute("type", "radio");
             input.setAttribute("name", "answer-quiz");
             input.setAttribute("class", "answer-quiz");
+            input.addEventListener("change", handleAnswerChange)
             containerAnswer.appendChild(input);
 
             let label = document.createElement("label");
             label.innerText = answer.text;
+            label.setAttribute("for", "answer-" + answer.id);
             containerAnswer.appendChild(label);
 
             formQuiz.appendChild(containerAnswer);
-        } 
-        
+        }    
     }
-    
+
+    function handleAnswerChange(event) {
+        sendButtonStatus(false);
+        stopCountDown();
+    }
 
     function printQuestion(questionIndex) {
+        document.querySelector(".form-quiz").style.display = "block";
         var questionDom = document.createElement("h2");
         
         questionDom.innerText = questions[questionIndex].question.text;
         formQuiz.appendChild(questionDom);        
     }
 
-    var sendButton = document.querySelector(".send-button");
-    sendButton.addEventListener("click", validateAnswer);
-
-
     function validateAnswer() {
+        var time = 20 - getCurrentTime();
         var result = getAnswerResult();
+        console.log(result, time);
+
+        if (result) {
+            totalScore = scoreSuccessQuestion(totalScore, time);
+        } else {
+            totalScore = scoreFailQuestion(totalScore, time);
+
+            if (totalScore < 0) {
+                totalScore = 0;
+            }
+        }
+
+        console.log(totalScore);
+
         printResult(result);
+        sendButtonStatus(true);
+        nextButtonStatus(false);
         removeQuiz();
         countDownHide();
     }
 
     function countDownHide() {
         var counter = document.querySelector(".counter");
-        counter.style.visibility = "hidden";
+        counter.style.display = "none";
     }
 
     function countDownVisible() {
         var counter = document.querySelector(".counter");
-        counter.style.visibility = "visible";
+        counter.style.display = "block";
     }
 
-
     function getAnswerResult() {
-        // var radios = document.querySelectorAll(".answer-quiz");
+        var radios = document.querySelectorAll(".answer-quiz");
         var currentQuestion = questions[currentQuestionIndex];
 
         var selectedAnswerId;
@@ -175,17 +200,16 @@ function app() {
         return question.correctAnswerId === parseInt(userSelectedAnswer);
     }
 
-
     function removeQuiz() {
-        // document.querySelector(".form-quiz").remove();
+        document.querySelector(".form-quiz").style.display = "none";
         document.querySelector(".form-quiz h2").remove();
         var inputs = document.querySelectorAll(".input-group"); 
 
         for(let input of inputs) {
             input.remove();
         }
-       questions.splice(currentQuestionIndex, 1);
-       
+
+        questions.splice(currentQuestionIndex, 1);       
     }
 
     function printResult(correctAnswer) {
@@ -198,12 +222,26 @@ function app() {
  
         if(correctAnswer) {
             message.innerText = "Has acertado";
-            sendButton.disabled = false;
         } else {
             message.innerText = "Has fallado";
-            sendButton.disabled = false;
         }
-        
+    }
+
+
+    function nextButtonStatus(disabled) {
+        if (disabled) {
+            nextButton.setAttribute("disabled", disabled);
+        } else {
+            nextButton.removeAttribute("disabled");
+        }
+    }
+
+    function sendButtonStatus(disabled) {
+        if (disabled) {
+            sendButton.setAttribute('disabled', disabled);
+        } else {
+            sendButton.removeAttribute('disabled');
+        }
     }
 
     function removePrintResult() {
@@ -211,17 +249,19 @@ function app() {
         message.remove();
     }
 
+    function hideAnswerActionButtons() {
+        document.querySelector('.send-answer').style.display = 'none';
+    }
+
     function registerUser() {
         registerUserNameForm.classList.add("visible"); 
 
-        sendButton.style.visibility = 'hidden';
-        nextButton.style.visibility = 'hidden';        
+        hideAnswerActionButtons();
     }
   
-    var nextButton = document.querySelector(".next-question-button");
-    nextButton.disabled = false;
-    nextButton.addEventListener("click", function() {
-        
+    nextButton.addEventListener("click", function() {     
+        stopCountDown();
+
         if(questions.length > 0) {
             start();
             countDownVisible()
@@ -230,91 +270,69 @@ function app() {
             removePrintResult();
             registerUser();
         }
-
     });
-
-    var countDown;
-    var timer;
 
     function countDownStart() {
         defineCountDown();
+        printCountDown();
         activateCountDown();   
     }
 
     function defineCountDown(){
-        countDown = 21;
+        countDown = 20;
     }
 
     function activateCountDown() {
-        timer = setInterval(function(){ 
-         updateCountDown();
-        
-        }, 1000);
+        timer = setInterval(updateCountDown, 1000);
+    }
+
+    function printCountDown() {
+        var counterDom = document.querySelector(".counter-num");
+        counterDom.innerHTML = countDown;
     }
 
     function updateCountDown() {
+        printCountDown();
+        
         countDown--;
-        var counterDom = document.querySelector(".counter");
-        counterDom.innerHTML = "Tiempo: " + countDown;
 
         if(countDown === 0 ) { 
+            printCountDown();
+
             stopCountDown();
         }
-
-        if(countDown > 0) {
-            answerCheck();
-        }
-
     }
 
     function stopCountDown(){
         clearInterval(timer);
     }
-
-
-    function answerCheck() {
-
-        var foundInputChecked = radios.find(function(element) {
-            return element.checked;
-          });
-
-        // console.log("paso por aqui")
-        // for (var i = 0; i < radios.length; i++) {
-        //     if (radios[i].checked) {
-
-        //         console.log("me meto en el if")
-        //         inputChecked = radios[i].checked;
-                    // stopCountDown();
-        //     }
-        // }
-        
+    
+    function getCurrentTime() {
+        return parseInt(document.querySelector(".counter-num").innerText, 10);
     }
 
+    function scoreSuccessQuestion(score, time) {
+        if (time <= 2) {
+            return score + 2;
+        }
+        if (time <= 10) {
+            return score + 1;
+        }
 
-    // function recalcularAcertandoPregunta(marcador, tiempo) {
-    //     if (tiempo <= 2) {
-    //         return marcador + 2;
-    //     }
-    //     if (tiempo <= 10) {
-    //         return marcador + 1;
-    //     }
-    //     if (tiempo > 10){
-    //         return marcador;
-    //     }
-    // }
+        return score;
+    }
 
-    // function recalcularFallandoPregunta(marcador, tiempo) {
-    //     if (tiempo <= 10) {
-    //         return marcador - 1;
-    //     }
-    //     if (tiempo < 20) {
-    //         return marcador - 2;
-    //     }
-    // }
-
-    // function recalcularSinRespuesta(marcador) {
-    //     return marcador - 3;
-    // }
+    function scoreFailQuestion(score, time) {
+        if (time <= 10) {
+            return score - 1;
+        }
+        
+        return score - 2;
+    }
+    
+    function scoreNotAnsweredQuestion(score) {
+        return score - 3;
+    }
 
 
     // var registerUserButton = document.querySelector(".register-user-button");
@@ -339,14 +357,8 @@ function app() {
 
     return {
         start : start
-    }
-    
-   
-    start();
-    
+    };    
 }
-
-
 
 
 // -Cuando el usuario hace click en boton siguiente pregunta: 
