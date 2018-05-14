@@ -127,7 +127,7 @@ button:disabled {
 
 .register-user-button {
     display: block;
-    margin-top: 20px;
+    margin: 20px 0;
 }
 
 .register-username-form {

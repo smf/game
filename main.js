@@ -67,7 +67,8 @@ function app() {
     var totalSuccessQuestions = 0;
     var totalScore = 0;
     var totalTimeAnswerSpeed = 0;
-    
+    var savedScores = JSON.parse(localStorage.getItem('listScore')) || [];
+     printSavedScores();
 
     function getQuestions(callback){
         var serverData = [
@@ -316,12 +317,11 @@ function app() {
     }
 
     function updateCountDown() {
-        printCountDown();
-        
         countDown--;
 
+        printCountDown();
+
         if(countDown === 0 ) { 
-            printCountDown();
             stopCountDown();
             totalScore = scoreNotAnsweredQuestion(totalScore);
         }
@@ -362,31 +362,45 @@ function app() {
 
     function scoreBoardUser(e) {
         e.preventDefault();
-    
+ 
         var scoreBoardTable = document.querySelector(".points-table tbody");
         var tr = document.createElement("tr");
         var td = document.createElement("td");
-        var userInput = document.querySelector(".register-user-input");
-        td.innerText = userInput.value;
+        var userInput = document.querySelector(".register-user-input").value;
+        td.innerText = userInput;
         tr.appendChild(td);
 
+        var scoreBoardUserPoints = {
+            name : userInput,
+            points: totalScore
+        }
+
+        savedScores.push(scoreBoardUserPoints);
+        localStorage.setItem('listScore', JSON.stringify(savedScores));
+       
         var tdScore = document.createElement("td");
-        tdScore.innerText = totalScore;
+        tdScore.innerText = totalScore;      
         tr.appendChild(tdScore);
         scoreBoardTable.appendChild(tr);
+
+    }
+
+    function printSavedScores() {
+        for(let scoreBoardUserPoint of savedScores) {
+            var scoreBoardTable = document.querySelector(".points-table tbody");
+            var tr = document.createElement("tr");
+            var td = document.createElement("td");
+            td.innerText = scoreBoardUserPoint.name;
+            tr.appendChild(td);
+
+            var tdScore = document.createElement("td");
+            tdScore.innerText = scoreBoardUserPoint.points;     
+            tr.appendChild(tdScore);
+            scoreBoardTable.appendChild(tr);  
+        }
     }
 
     return {
         start : start
     };    
 }
-
-
-// -Cuando el usuario hace click en boton siguiente pregunta: 
-//         *se genera una nueva pregunta y 3 respuestas
-//         *cuando se ha terminado el cuestionario: 
-//             ·se imprime un mensaje Has conseguido 3 puntos
-//             ·Ya no se pinta siguiente pregunta
-//             ·sale un input para enviar el nombre y un boton 
-
-
