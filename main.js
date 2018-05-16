@@ -68,6 +68,8 @@ function app() {
     var totalScore = 0;
     var totalTimeAnswerSpeed = 0;
     var savedScores = JSON.parse(localStorage.getItem('listScore')) || [];
+    var scoreBoardTable = document.querySelector(".points-table tbody"); 
+           
      printSavedScores();
 
     function getQuestions(callback){
@@ -362,13 +364,8 @@ function app() {
 
     function scoreBoardUser(e) {
         e.preventDefault();
- 
-        var scoreBoardTable = document.querySelector(".points-table tbody");
-        var tr = document.createElement("tr");
-        var td = document.createElement("td");
+
         var userInput = document.querySelector(".register-user-input").value;
-        td.innerText = userInput;
-        tr.appendChild(td);
 
         var scoreBoardUserPoints = {
             name : userInput,
@@ -378,26 +375,27 @@ function app() {
         savedScores.push(scoreBoardUserPoints);
         localStorage.setItem('listScore', JSON.stringify(savedScores));
        
-        var tdScore = document.createElement("td");
-        tdScore.innerText = totalScore;      
-        tr.appendChild(tdScore);
-        scoreBoardTable.appendChild(tr);
-
+        printUserScore(userInput, totalScore);
     }
 
     function printSavedScores() {
         for(let scoreBoardUserPoint of savedScores) {
-            var scoreBoardTable = document.querySelector(".points-table tbody");
-            var tr = document.createElement("tr");
-            var td = document.createElement("td");
-            td.innerText = scoreBoardUserPoint.name;
-            tr.appendChild(td);
-
-            var tdScore = document.createElement("td");
-            tdScore.innerText = scoreBoardUserPoint.points;     
-            tr.appendChild(tdScore);
-            scoreBoardTable.appendChild(tr);  
+            printUserScore(scoreBoardUser.name, scoreBoardUser.points);
         }
+    }
+
+    function printUserScore(userName, points) { 
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        
+        td.innerText = userName;
+        tr.appendChild(td);
+
+        var tdScore = document.createElement("td");
+        tdScore.innerText = points;      
+
+        tr.appendChild(tdScore);
+        scoreBoardTable.appendChild(tr);
     }
 
     return {
